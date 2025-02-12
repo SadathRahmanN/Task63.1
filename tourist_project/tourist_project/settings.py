@@ -9,17 +9,21 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security
-SECRET_KEY = 'django-insecure-^=6-_k)oh!n9-fpcd1qd0rf(!8y2!!8cc*so1if(!*ydv@*_dc'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-^=6-_k)oh!n9-fpcd1qd0rf(! 8y2!!8cc*so1if(!*ydv@*_dc')
 DEBUG = True
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
-    '8000-idx-task631-1738392911915.cluster-a3grjzek65cxex762e4mwrzl46.cloudworkstations.dev'
+    '8000-idx-task631-1738392911915.cluster-a3grjzek65cxex762e4mwrzl46.cloudworkstations.dev',
+    '8000-idx-task631-1739252849687.cluster-qpa6grkipzc64wfjrbr3hsdma2.cloudworkstations.dev',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
+    'http://8000-idx-task631-1738392911915.cluster-a3grjzek65cxex762e4mwrzl46.cloudworkstations.dev',
     'https://8000-idx-task631-1738392911915.cluster-a3grjzek65cxex762e4mwrzl46.cloudworkstations.dev',
+    'http://8000-idx-task631-1739252849687.cluster-qpa6grkipzc64wfjrbr3hsdma2.cloudworkstations.dev',
+    'https://8000-idx-task631-1739252849687.cluster-qpa6grkipzc64wfjrbr3hsdma2.cloudworkstations.dev',
 ]
 
 # Application definition
@@ -118,6 +122,13 @@ else:
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
     SECURE_SSL_REDIRECT = True
+
+# Additional security settings
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_HSTS_SECONDS = 3600
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
