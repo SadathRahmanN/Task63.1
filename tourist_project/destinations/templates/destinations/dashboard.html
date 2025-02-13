@@ -25,7 +25,7 @@
             <div class="card stat-card">
                 <div class="card-body">
                     <h5 class="card-title">Total Destinations</h5>
-                    <h2 class="card-text">{{ destinations.count }}</h2>
+                    <h2 class="card-text">{{ created_destinations.count }}</h2>
                 </div>
             </div>
         </div>
@@ -34,8 +34,8 @@
                 <div class="card-body">
                     <h5 class="card-title">Last Added</h5>
                     <h2 class="card-text">
-                        {% if destinations %}
-                            {{ destinations.0.created_at|timesince }} ago
+                        {% if created_destinations %}
+                            {{ created_destinations.0.created_at|timesince }} ago
                         {% else %}
                             -
                         {% endif %}
@@ -71,7 +71,7 @@
 
         <!-- Destinations Grid -->
         <div class="row" id="destinations-list">
-            {% for destination in destinations %}
+            {% for destination in created_destinations %}
             <div class="col-md-4 mb-4">
                 <div class="card h-100">
                     <img src="{{ destination.image.url }}" class="card-img-top" 
@@ -80,23 +80,26 @@
                         <h5 class="card-title">{{ destination.place_name }}</h5>
                         <p class="card-text text-muted small">
                             Created: {{ destination.created_at|date:"M d, Y" }}<br>
-                            Last updated: {{ destination.updated_at|timesince }} ago
+                            Last updated: {{ destination.modified_at|timesince }} ago
                         </p>
                     </div>
                     <div class="card-footer bg-transparent">
                         <div class="btn-group w-100">
+                            <!-- View Details Button -->
                             <a href="{% url 'destination_detail' destination.pk %}" 
                                class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-eye"></i>
+                                <i class="bi bi-eye"></i> View
                             </a>
+                            <!-- Update Button -->
                             <a href="{% url 'destination_update' destination.pk %}" 
                                class="btn btn-sm btn-outline-warning">
-                                <i class="bi bi-pencil"></i>
+                                <i class="bi bi-pencil"></i> Edit
                             </a>
+                            <!-- Delete Button with Modal Trigger -->
                             <button class="btn btn-sm btn-outline-danger" 
                                     data-bs-toggle="modal" 
                                     data-bs-target="#deleteModal-{{ destination.pk }}">
-                                <i class="bi bi-trash"></i>
+                                <i class="bi bi-trash"></i> Delete
                             </button>
                         </div>
                     </div>
@@ -135,6 +138,7 @@
         </div>
 
         <!-- Pagination -->
+
         {% if is_paginated %}
         <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
