@@ -8,25 +8,24 @@ import os
 # Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Security
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-^=6-_k)oh!n9-fpcd1qd0rf(! 8y2!!8cc*so1if(!*ydv@*_dc')
-DEBUG = True
+# =============================================================================
+# Security Settings (CRITICAL FOR PRODUCTION)
+# =============================================================================
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-^=6-_k)oh!n9-fpcd1qd0rf(! 8y2!!8cc*so1if(!*ydv@*_dc')  # Remove default in production
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'  # Always False in production
 
 ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
-    '8000-idx-task631-1738392911915.cluster-a3grjzek65cxex762e4mwrzl46.cloudworkstations.dev',
-    '8000-idx-task631-1739252849687.cluster-qpa6grkipzc64wfjrbr3hsdma2.cloudworkstations.dev',
+    'task63.onrender.com',
+    '*',  # Remove this after initial testing
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://8000-idx-task631-1738392911915.cluster-a3grjzek65cxex762e4mwrzl46.cloudworkstations.dev',
-    'https://8000-idx-task631-1738392911915.cluster-a3grjzek65cxex762e4mwrzl46.cloudworkstations.dev',
-    'http://8000-idx-task631-1739252849687.cluster-qpa6grkipzc64wfjrbr3hsdma2.cloudworkstations.dev',
-    'https://8000-idx-task631-1739252849687.cluster-qpa6grkipzc64wfjrbr3hsdma2.cloudworkstations.dev',
+    'https://task63.onrender.com',  # REPLACE WITH YOUR RENDER URL
 ]
 
-# Application definition
+# =============================================================================
+# Application Definition
+# =============================================================================
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -38,10 +37,12 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'rest_framework',
     'destinations',
+    'whitenoise.runserver_nostatic',  # Add this
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add this
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -50,9 +51,54 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'tourist_project.urls'
+# =============================================================================
+# Database (SQLITE - EPHEMERAL WARNING)
+# =============================================================================
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
-# Crispy Forms Configuration
+# =============================================================================
+# Static & Media Files (Whitenoise Configuration)
+# =============================================================================
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+    BASE_DIR / 'destinations/static',
+]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# =============================================================================
+# Security Headers (Production Only)
+# =============================================================================
+if not DEBUG:
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+else:
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# =============================================================================
+# Remaining Settings
+# =============================================================================
+ROOT_URLCONF = 'tourist_project.urls'
+WSGI_APPLICATION = 'tourist_project.wsgi.application'
+
+# Crispy Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
@@ -60,7 +106,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -72,16 +118,6 @@ TEMPLATES = [
         },
     },
 ]
-
-WSGI_APPLICATION = 'tourist_project.wsgi.application'
-
-# Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -97,41 +133,13 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-    os.path.join(BASE_DIR, 'destinations/static'),
-]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# Media files
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 # Authentication
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'home'
 
-# Security
-if DEBUG:
-    CSRF_COOKIE_SECURE = False
-    SESSION_COOKIE_SECURE = False
-else:
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
-    SECURE_SSL_REDIRECT = True
-
-# Additional security settings
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_HSTS_SECONDS = 3600
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 # Proxy settings
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
